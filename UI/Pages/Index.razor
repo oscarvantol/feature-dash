@@ -1,0 +1,80 @@
+﻿@page "/"
+@inject HttpClient Http
+
+<PageTitle>Release toggles</PageTitle>
+<style>
+    .demo-mat-card {
+        /* max-width: 400px; */
+    }
+
+    .demo-mat-card-content {
+        padding: 1rem;
+    }
+
+    .demo-mat-card-clean-margin {
+        margin: 0px;
+    }
+</style>
+
+
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+
+        @if (featureSettings == null)
+        {
+            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Large" />
+            </div>
+        }
+        else
+        {
+            @foreach (var featureSetting in featureSettings)
+            {
+
+                <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                    <MatCard class="demo-mat-card">
+                        <MatCardContent>
+                            <div class="demo-mat-card-content">
+                                <MatHeadline4 class="demo-mat-card-clean-margin">
+                                    @featureSetting.FeatureId
+                                </MatHeadline4>
+
+                                @if (!string.IsNullOrWhiteSpace(@featureSetting.Label))
+                                {
+                                    <MatChipSet>
+                                        <MatChip Label="@featureSetting.Label"></MatChip>
+                                    </MatChipSet>
+                                }
+                            </div>
+                            <MatBody1 class="demo-mat-card-content demo-mat-card-clean-margin">
+                                @featureSetting.Description
+                            </MatBody1>
+                            <MatBody2 class="demo-mat-card-content demo-mat-card-clean-margin">
+                                Last change: @featureSetting.LastModified
+                            </MatBody2>
+                        </MatCardContent>
+                        <MatCardActions>
+   
+                            <MatCardActionIcons>
+                                <MatSlideToggle TValue="bool" Value="@featureSetting.Enabled"></MatSlideToggle>
+                            </MatCardActionIcons>
+                        </MatCardActions>
+                    </MatCard>
+
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+@code {
+    private FeatureSettingModel[]? featureSettings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        featureSettings = await Http.GetFromJsonAsync<FeatureSettingModel[]>("api/FeatureSettings");
+    }
+
+    public record FeatureSettingModel(string FeatureId, string Label, string Description, bool Enabled, DateTimeOffset? LastModified);
+}
