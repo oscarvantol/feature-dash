@@ -1,9 +1,7 @@
 using Azure.Data.AppConfiguration;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.FeatureManagement;
 
 namespace FeatureDashApi;
 
@@ -21,15 +19,26 @@ public class FeatureSettingsFunctions
     [Function(nameof(GetFeatureSettings))]
     public async Task<FeatureSettingModel[]> GetFeatureSettings([HttpTrigger(AuthorizationLevel.Function, "get", Route = "FeatureSettings")] HttpRequestData req)
     {
-        var result = new List<FeatureSettingModel>();
+        var featureSettings = await GetAllFeatureSettings().ToListAsync();
+        return featureSettings.Select(feature =>
+                new FeatureSettingModel(feature.FeatureId, feature.Label, feature.Description, feature.IsEnabled, feature.LastModified))
+            .ToArray();
+    }
 
-        await foreach (ConfigurationSetting setting in _configurationClient.GetConfigurationSettingsAsync(new SettingSelector() { KeyFilter = ".appconfig.featureflag/*" }))
+    [Function(nameof(GetLabels))]
+    public async Task<string[]> GetLabels([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Labels")] HttpRequestData req)
+    {
+        var featureSettings = await GetAllFeatureSettings().ToListAsync();
+        return featureSettings.Select(f => f.Label).Distinct().ToArray();
+    }
+
+    private async IAsyncEnumerable<FeatureFlagConfigurationSetting> GetAllFeatureSettings()
+    {
+        await foreach (var setting in _configurationClient.GetConfigurationSettingsAsync(new SettingSelector() { KeyFilter = ".appconfig.featureflag/*" }))
         {
-            _logger.LogInformation(setting.Key);
             if (setting is FeatureFlagConfigurationSetting feature)
-                result.Add(new FeatureSettingModel(feature.FeatureId, feature.Label, feature.Description, feature.IsEnabled, feature.LastModified));
+                yield return feature;
         }
-        return result.ToArray();
     }
 
     [Function(nameof(SetFeatureSettings))]
