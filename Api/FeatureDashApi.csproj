@@ -8,10 +8,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Data.AppConfiguration" Version="1.2.0" />
+    <PackageReference Include="Azure.Identity" Version="1.9.0-beta.1" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.Functions.Worker" Version="5.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.10.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.7.0" />
+	  <PackageReference Include="Microsoft.FeatureManagement" Version="2.5.1" />
+	  <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="2.5.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
