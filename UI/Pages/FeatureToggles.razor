@@ -1,0 +1,82 @@
+﻿@page "/FeatureToggles"
+@inject HttpClient Http
+
+<PageTitle>Feature toggles</PageTitle>
+
+<MatPaper Elevation="4" class="feature-header">
+    <MatSelect Label="Filter features" @bind-Value="filter">
+        <MatOptionString Value="all">All</MatOptionString>
+        <MatOptionString Value="enabled">Enabled</MatOptionString>
+        <MatOptionString Value="disabled">Disabled</MatOptionString>
+    </MatSelect>
+</MatPaper>
+
+
+<MatAccordion Multi="true" class="features">
+    @foreach (var featureSetting in FilteredFeatureSettings)
+    {
+        <MatExpansionPanel>
+            <MatExpansionPanelSummary>
+                <MatExpansionPanelHeader class="@(featureSetting.Enabled?"enabled-feature":"disabled-feature")">
+                    @featureSetting.FeatureId
+                </MatExpansionPanelHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+                @featureSetting.Description
+                <MatChipSet>
+                    @if (!string.IsNullOrWhiteSpace(@featureSetting.Label))
+                    {
+                        <MatChip Label="@featureSetting.Label"></MatChip>
+                    }
+                    <MatChip Label="@featureSetting.LastModified?.ToString()"></MatChip>
+                </MatChipSet>
+
+                <div class="toggle">
+                    <MatSlideToggle TValue="bool" ValueChanged="@(async (e)  => await OnToggleFeatureToggle(featureSetting, e))" Value="@featureSetting.Enabled"></MatSlideToggle>
+                </div>
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+    }
+</MatAccordion>
+
+
+
+@code {
+    private FeatureSettingModel[]? featureSettings;
+    private string filter = "all";
+
+    private FeatureSettingModel[]? FilteredFeatureSettings
+    {
+        get
+        {
+            switch (filter)
+            {
+                case "disabled":
+                    return featureSettings?.Where(f => !f.Enabled).ToArray();
+                case "enabled":
+                    return featureSettings?.Where(f => f.Enabled).ToArray();
+                default:
+                    return featureSettings;
+            }
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadData();
+    }
+
+    protected async Task ReloadData()
+    {
+        featureSettings = await Http.GetFromJsonAsync<FeatureSettingModel[]>("api/FeatureSettings");
+    }
+
+    private async Task OnToggleFeatureToggle(FeatureSettingModel featureSettingModel, bool newValue)
+    {
+        await Http.PostAsJsonAsync($"api/FeatureSettings/{featureSettingModel.FeatureId}", featureSettingModel with { Enabled = newValue });
+        await ReloadData();
+    }
+
+    public record FeatureSettingModel(string FeatureId, string Label, string Description, bool Enabled, DateTimeOffset? LastModified);
+}

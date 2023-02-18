@@ -1,8 +1,41 @@
 ﻿@inherits LayoutComponentBase
 
-@*<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>*@
-    @Body
-@*</div>*@
+
+<MatAppBarContainer>
+    <MatAppBar Fixed="true">
+        <MatAppBarRow>
+            <MatAppBarSection>
+                <MatIconButton Icon="menu" OnClick="@((e) => ToggleMenu())"></MatIconButton>
+                <MatAppBarTitle>FeatureDash - DEVELOPMENT</MatAppBarTitle>
+            </MatAppBarSection>
+        </MatAppBarRow>
+    </MatAppBar>
+    <MatAppBarContent>
+        <MatDrawerContainer Style="width: 100vw; height: 100vh;">
+            <MatDrawer @bind-Opened="@Opened">
+                <MatNavMenu>
+                    <MatNavItem Href="FeatureToggles"><MatIconButton Icon="settings_applications"></MatIconButton>Feature toggles</MatNavItem>
+                    <MatNavItem><MatIconButton Icon="refresh"></MatIconButton>Rotate Sentinel Key</MatNavItem>
+                    <MatNavItem><MatIconButton Icon="settings"></MatIconButton>Settings</MatNavItem>
+                    <MatNavItem><MatIconButton Icon="info"></MatIconButton>About</MatNavItem>
+                </MatNavMenu>
+            </MatDrawer>
+            <MatDrawerContent>
+                @Body
+            </MatDrawerContent>
+        </MatDrawerContainer>
+
+    </MatAppBarContent>
+</MatAppBarContainer>
+
+
+@code
+{
+    bool Opened = true;
+
+    void ToggleMenu()
+    {
+        Opened = !Opened;
+    }
+
+}

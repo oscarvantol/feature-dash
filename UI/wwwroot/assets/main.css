@@ -1,0 +1,44 @@
+:root {
+    --mdc-theme-primary: #FC5130;
+}
+
+body {
+    margin: 0;
+}
+
+.mdc-drawer {
+    background-color: #050401;
+}
+
+    .mdc-drawer .mdc-list-item {
+        color: #FFFAFF;
+    }
+
+.mdc-drawer-app-content {
+    background-color: #303036;
+}
+
+.features {
+    font-family: var(--mdc-typography-subtitle2-font-family, var(--mdc-typography-font-family, Roboto, sans-serif));
+}
+
+    .features .toggle {
+        display: flex;
+        flex-direction: row-reverse;
+    }
+
+.enabled-feature {
+    font-weight: bolder;
+}
+
+.disabled-feature {
+    color: #aaaaaa;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.feature-header {
+    background-color: #FFFAFF;
+    padding: 1em;
+    margin-bottom: 1em;
+}
