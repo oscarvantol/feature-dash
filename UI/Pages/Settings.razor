@@ -1,0 +1,44 @@
+﻿@page "/Settings"
+@inject HttpClient Http
+
+<PageTitle>Settings</PageTitle>
+
+<MatPaper Elevation="4" class="content-background">
+    <form>
+        <p>
+            <MatTextField @bind-Value="@SentinalKeyName" HelperText="The name of your sentinal key" Label="Sentinal Key"></MatTextField>
+        </p>
+        <p>
+            <MatTextField @bind-Value="@EnvironmentName" HelperText="Name that will appear in the title" Label="EnvironmentName"></MatTextField>
+        </p>
+        <p>
+            <MatButton Raised="true" type="submit" name="action">Save</MatButton>
+        </p>
+    </form>
+</MatPaper>
+
+@code
+{
+    private string _sentinalKeyName;
+    private string _environmentName;
+
+    public string SentinalKeyName
+    {
+        get => _environmentName;
+        set
+        {
+            _environmentName = value;
+            this.StateHasChanged();
+        }
+    }
+    public string EnvironmentName
+    {
+        get => _sentinalKeyName;
+        set
+        {
+            _sentinalKeyName = value;
+            this.StateHasChanged();
+        }
+    }
+
+}

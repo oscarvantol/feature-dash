@@ -1,4 +1,4 @@
-﻿@page "/FeatureToggles"
+﻿@page "/FeatureFlags"
 @inject HttpClient Http
 
 <PageTitle>Feature toggles</PageTitle>
@@ -42,21 +42,21 @@
 
 
 @code {
-    private FeatureSettingModel[]? featureSettings;
+    private FeatureFlagModel[]? featureFlags;
     private string filter = "all";
 
-    private FeatureSettingModel[]? FilteredFeatureSettings
+    private FeatureFlagModel[]? FilteredFeatureSettings
     {
         get
         {
             switch (filter)
             {
                 case "disabled":
-                    return featureSettings?.Where(f => !f.Enabled).ToArray();
+                    return featureFlags?.Where(f => !f.Enabled).ToArray();
                 case "enabled":
-                    return featureSettings?.Where(f => f.Enabled).ToArray();
+                    return featureFlags?.Where(f => f.Enabled).ToArray();
                 default:
-                    return featureSettings;
+                    return featureFlags;
             }
         }
 
@@ -69,14 +69,14 @@
 
     protected async Task ReloadData()
     {
-        featureSettings = await Http.GetFromJsonAsync<FeatureSettingModel[]>("api/FeatureSettings");
+        featureFlags = await Http.GetFromJsonAsync<FeatureFlagModel[]>("api/FeatureFlags");
     }
 
-    private async Task OnToggleFeatureToggle(FeatureSettingModel featureSettingModel, bool newValue)
+    private async Task OnToggleFeatureToggle(FeatureFlagModel featureSettingModel, bool newValue)
     {
-        await Http.PostAsJsonAsync($"api/FeatureSettings/{featureSettingModel.FeatureId}", featureSettingModel with { Enabled = newValue });
+        await Http.PostAsJsonAsync($"api/FeatureFlags/{featureSettingModel.FeatureId}/IsEnabled/?label={featureSettingModel.Label}", newValue);
         await ReloadData();
     }
 
-    public record FeatureSettingModel(string FeatureId, string Label, string Description, bool Enabled, DateTimeOffset? LastModified);
+    public record FeatureFlagModel(string FeatureId, string Label, string Description, bool Enabled, DateTimeOffset? LastModified);
 }
